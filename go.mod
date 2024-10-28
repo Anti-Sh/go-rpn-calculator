@@ -1,1 +1,1 @@
-module ozon
+module go-rpn-calculator
