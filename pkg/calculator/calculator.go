@@ -1,7 +1,6 @@
 package calculator
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -27,25 +26,32 @@ func (c *Calculator) Execute() (float64, error) {
 	for _, token := range tokens {
 		if isOperator(rune(token[0])) {
 			if len(stack) < 2 {
-				return 0, fmt.Errorf("недостаточно операндов для операции %s", token)
+				// "Invalid Expression (not enough operands) %s", token
+				return 0, ErrInvalidExpression
 			}
 			b := stack[len(stack)-1]
 			a := stack[len(stack)-2]
 			stack = stack[:len(stack)-2]
 
-			result := opEval(rune(token[0]), a, b)
+			result, err := opEval(rune(token[0]), a, b)
+
+			if err != nil {
+				return 0, err
+			}
+
 			stack = append(stack, result)
 		} else {
 			value, err := strconv.ParseFloat(token, 64)
 			if err != nil {
-				return 0, fmt.Errorf("ошибка преобразования токена %s: %v", token, err)
+				// "unknown token %s: %v", token, err
+				return 0, ErrUnknownToken
 			}
 			stack = append(stack, value)
 		}
 	}
 
 	if len(stack) != 1 {
-		return 0, fmt.Errorf("неверное постфиксное выражение")
+		return 0, ErrInvalidExpression
 	}
 
 	return stack[0], nil
@@ -75,7 +81,9 @@ func (c *Calculator) updatePostfix() {
 				postfix = append(postfix, string(stack[len(stack)-1]))
 				stack = stack[:len(stack)-1]
 			}
-			stack = stack[:len(stack)-1]
+			if len(stack) > 0 {
+				stack = stack[:len(stack)-1]
+			}
 		} else {
 			postfix = append(postfix, token)
 		}
