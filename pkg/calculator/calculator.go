@@ -26,7 +26,6 @@ func (c *Calculator) Execute() (float64, error) {
 	for _, token := range tokens {
 		if isOperator(rune(token[0])) {
 			if len(stack) < 2 {
-				// "Invalid Expression (not enough operands) %s", token
 				return 0, ErrInvalidExpression
 			}
 			b := stack[len(stack)-1]
