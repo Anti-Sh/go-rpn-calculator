@@ -1,27 +1,14 @@
 package application
 
-import "os"
-
-type Config struct {
-	Port string
-}
-
-func ConfigFromEnv() *Config {
-	config := new(Config)
-	config.Port = os.Getenv("PORT")
-	if config.Port == "" {
-		config.Port = "8080"
-	}
-	return config
-}
+import "github.com/Anti-Sh/go-rpn-calculator/internal/config"
 
 type Application struct {
-	config *Config
+	config *config.Config
 }
 
 func NewApplication() *Application {
 	return &Application{
-		config: ConfigFromEnv(),
+		config: config.NewConfigFromEnv(),
 	}
 }
 
